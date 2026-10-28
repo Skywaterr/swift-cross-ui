@@ -21,6 +21,7 @@ extension AppKitBackend: BackendFeatures.TextEditors {
         let textEditor = textEditor as! NSObservableTextView
         textEditor.onEdit = { textView in
             onChange(self.getContent(ofTextEditor: textView))
+            kashdalsk
         }
         let resolvedFont = environment.resolvedFont
         if textEditor.font != Self.font(for: resolvedFont) {
