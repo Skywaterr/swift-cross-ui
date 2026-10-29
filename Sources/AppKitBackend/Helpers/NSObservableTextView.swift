@@ -1,7 +1,7 @@
 import AppKit
 
-class NSObservableTextView: NSTextView, NSTextViewDelegate {
-    func textDidChange(_ notification: Notification) {
+public class NSObservableTextView: NSTextView, NSTextViewDelegate {
+    public func textDidChange(_ notification: Notification) {
         onEdit?(self)
     }
 

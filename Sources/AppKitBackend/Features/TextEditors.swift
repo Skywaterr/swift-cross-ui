@@ -2,10 +2,19 @@ import AppKit
 @_spi(Backends) import SwiftCrossUI
 
 extension AppKitBackend: BackendFeatures.TextEditors {
+
+    public static var useCaretEditor: Bool = false
+    
     public func createTextEditor() -> Widget {
-        let textEditor = NSObservableTextView()
+        let textEditor: NSTextView
+        if (Self.useCaretEditor) {
+            textEditor = CaretTextView()
+        } else {
+            textEditor = NSObservableTextView()
+        }
+        
         textEditor.drawsBackground = false
-        textEditor.delegate = textEditor
+        textEditor.delegate = textEditor as? any NSTextViewDelegate
         textEditor.allowsUndo = true
         textEditor.isRichText = false
         textEditor.textContainerInset = .zero
@@ -21,7 +30,6 @@ extension AppKitBackend: BackendFeatures.TextEditors {
         let textEditor = textEditor as! NSObservableTextView
         textEditor.onEdit = { textView in
             onChange(self.getContent(ofTextEditor: textView))
-            kashdalsk
         }
         let resolvedFont = environment.resolvedFont
         if textEditor.font != Self.font(for: resolvedFont) {
@@ -29,6 +37,10 @@ extension AppKitBackend: BackendFeatures.TextEditors {
         }
         textEditor.appearance = environment.colorScheme.nsAppearance
         textEditor.isEditable = environment.isEnabled
+        
+        // Changing the color of the font
+        textEditor.textColor = NSColor.black // Or .systemRed, .gray, or a custom NSColor
+        textEditor.typingAttributes[.foregroundColor] = NSColor.black
 
         if #available(macOS 14, *) {
             textEditor.contentType =
@@ -48,10 +60,10 @@ extension AppKitBackend: BackendFeatures.TextEditors {
     }
 
     public func setContent(ofTextEditor textEditor: Widget, to content: String) {
-        (textEditor as! NSObservableTextView).string = content
+        (textEditor as! NSTextView).string = content
     }
 
     public func getContent(ofTextEditor textEditor: Widget) -> String {
-        (textEditor as! NSObservableTextView).string
+        (textEditor as! NSTextView).string
     }
 }
